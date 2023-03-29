@@ -15,6 +15,7 @@ const listTipoEquipos = async () => {
     const { data } = await getTipoEquipos(query)
     console.log(data)
     setTipoEquipos(data)
+    
     setTimeout(() => {
       setLoading(false)
     }, 500)
