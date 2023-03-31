@@ -11,8 +11,12 @@ const getTipoEquipos = (estado) => {
 
 
 // crear tipo equipo
-const createTipoEquipo = () => {
-
+const createTipoEquipo = (data = {}) => {
+    return axiosConfig.post('tiposequipos', data, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }
 
 export {
