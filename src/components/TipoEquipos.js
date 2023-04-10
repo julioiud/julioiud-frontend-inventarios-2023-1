@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
-import { createTipoEquipo, getTipoEquipos } from '../services/TipoEquipoService'
+import { createTipoEquipo, getTipoEquipos, editarTipoEquipo } from '../services/TipoEquipoService'
 import Modal from './ui/Modal'
+import ModalEdit from './ui/ModalEdit'
 
 export default function TipoEquipos() {
 const title= 'Tipo de Equipo'
@@ -13,6 +14,8 @@ const [tipoEquipo, setTipoEquipo] = useState({
   nombre: ''
 })
 const [loadingSave, setLoadingSave] = useState(false)
+
+const [id, setId] = useState('')
 
 const listTipoEquipos = async () => {
   try{
@@ -68,10 +71,44 @@ const saveTipoEquipo = async () => {
 
 const closeModal = () => {
   setTipoEquipo({nombre: ''})
+  if(id)setId('')
+}
+
+const selectTipoEquipo = (evt) => {
+  evt.preventDefault()
+  setId(evt.target.id)
+  const tEq = tipoEquipos.filter(tipoEquipo => tipoEquipo._id === evt.target.id)
+  setTipoEquipo({...tEq[0]})
+}
+
+const editTipoEquipo = async () => {
+  try{
+    setError(false)
+    setLoadingSave(true)
+    const response = await editarTipoEquipo(id, tipoEquipo)
+    console.log(response)
+    setTipoEquipo({nombre: ''})
+    listTipoEquipos()
+    setTimeout(() => {
+      setLoadingSave(false)
+    }, 500)
+  }catch(e){
+    console.log(e)
+    setError(true)
+    setLoadingSave(false)
+  }
 }
 
   return (
     <>
+        <ModalEdit 
+          title={title}
+          closeModal={closeModal}
+          handleChange={handleChange}
+          tipoEquipo={tipoEquipo}
+          loadingSave={loadingSave}
+          editTipoEquipo={editTipoEquipo}
+        />
         <Modal 
           title={title}
           closeModal={closeModal}
@@ -145,7 +182,18 @@ const closeModal = () => {
                         <td>{tipoEquipo.estado ? 'Activo' : 'Inactivo'}</td>
                         <td>{dayjs(tipoEquipo.fechaCreacion).format('YYYY-MM-DD')}</td>
                         <td>{dayjs(tipoEquipo.fechaActualizacion).format('YYYY-MM-DD')}</td>
-                        <td><button type="button" className="btn btn-success">Editar</button></td>
+                        <td>
+                          <button 
+                            onClick={selectTipoEquipo}
+                            type="button" 
+                            className="btn btn-success"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#exampleModalEdit" 
+                            id={tipoEquipo._id}
+                          >
+                            Editar
+                          </button>
+                        </td>
                       </tr>
                     )
                   })
